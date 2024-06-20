@@ -10,7 +10,7 @@ export class taskSchema{
     description:string
 
     @Prop()
-    status:string
+    status:string 
 }
 
 export const TaskSchema = SchemaFactory.createForClass(taskSchema)
