@@ -1,52 +1,57 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import {Task,TaskStatus} from './task.model'
-import { v4 as uuid } from 'uuid'
 import { createTaskDto } from './DTO/create-task.dto';
 import { filterTaskDto } from './DTO/filter-task-dto';
+import { InjectModel } from '@nestjs/mongoose';
+import {Task as task} from './task.schema'
+import * as mongoose from 'mongoose';
 @Injectable()
 export class TaskService {
-    private tasks:Task[] = []
+    constructor(@InjectModel(task.name)
+    private taskModel:mongoose.Model<task>){}
 
-    findAllTask():Task[]{
-        return this.tasks 
+   async findAllTask(): Promise<Task[]>{
+        return this.taskModel.find()
     }
 
-    createTask(taskDto:createTaskDto){
+   async createTask(taskDto:createTaskDto){
     let {title,description} = taskDto
 
        const task:Task = {
-        id:uuid(),
         title,
         description,
         status:TaskStatus.OPEN
        } 
-       this.tasks.push(task)
-       return task;
+        const res = await this.taskModel.create(task)
+        return res
     }
 
-    getTaskByid(id: string) {
-        const found = this.tasks.find(task => task.id == id)
+        async getTaskByid(id: string):Promise<task> {
+        const found = await this.taskModel.findById(id)
         if (!found) {
             throw new NotFoundException(`Task with id:${id} is not found`);
         }
         return found
     }
-    deleteTaskById(id:string){
-        let index = this.tasks.findIndex(task => task.id == id)
-        if(index < 0){
-            throw new NotFoundException(`Task with id:${id} is not found`)
+    async deleteTaskById(id:string): Promise <boolean>{
+        let data = await this.taskModel.findByIdAndDelete(id) 
+        if(data){
+            return true
         }else{
-            this.tasks.splice(index,1)
-            return this.tasks
+            return false
         }
     }
-    updateTaskById(id:string,status:TaskStatus){
+    async updateTaskById(id:string,status:TaskStatus){
        let task = this.getTaskByid(id)
-       task.status = status
-       return task
+      if(task){
+       let found = await this.taskModel.updateOne({_id:id},{$set:{status:status}});
+       return true
+      }else{
+        throw new NotFoundException(`No task found to update`)
+      }
     }
-    getTaskByfilter(filterDto:filterTaskDto){
-        let tasks = this.findAllTask()
+   async getTaskByfilter(filterDto:filterTaskDto):Promise<task[]>{
+        let tasks = await this.findAllTask()
         const {status,search} = filterDto;
         if(status){
           tasks = tasks.filter(task => task.status === status)

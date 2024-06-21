@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TaskModule } from './task/task.module';
 import { MongooseModule } from '@nestjs/mongoose'
+import { ConfigModule } from '@nestjs/config';
 
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal:true
+    }),
     TaskModule,
-    MongooseModule.forRoot('mongodb+srv://elbowgrease001:unnimon@cluster0.nzjmbyf.mongodb.net/')
+    MongooseModule.forRoot(process.env.MONGO_URI)
   ],
   providers: [],
 })
