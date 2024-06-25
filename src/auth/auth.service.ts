@@ -11,8 +11,8 @@ export class AuthService {
         try {
             const { name, email, password } = signUpDto
 
-            let user = await this.userService.toCheckDuplicateUser(email)
-            if (user) {
+            const user = await this.userService.toCheckDuplicateUser(email)
+            if (user.length) {
                 throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
             }
             let hashedPass = await bcrypt.hash(password,10)

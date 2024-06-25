@@ -9,11 +9,9 @@ export class UsersService {
 
     async toCheckDuplicateUser(email:string){
         try {
-            let user = await this.userModel.find({email})
-            if(user){
-                return true
-            }else{
-                return false
+            let user = await this.userModel.find({email:email}).exec()
+            if(user.length){
+                return user
             }
         } catch (error) {
            throw new HttpException('Error creating user', HttpStatus.INTERNAL_SERVER_ERROR)
