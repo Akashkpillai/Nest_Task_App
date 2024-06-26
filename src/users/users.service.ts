@@ -1,25 +1,42 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel, MongooseModule } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import * as mongoose from 'mongoose';
+import { async } from 'rxjs';
 @Injectable()
 export class UsersService {
     constructor (@InjectModel(User.name) 
     private userModel:mongoose.Model<User>){}
 
-    async toCheckDuplicateUser(email:string){
+    async toCheckDuplicateUser(email:string):Promise< User|null>{
         try {
-            let user = await this.userModel.find({email:email}).exec()
-            if(user.length){
-                return user
-            }
+            let user = await this.userModel.findOne({email}).lean()
+            return user  
         } catch (error) {
-           throw new HttpException('Error creating user', HttpStatus.INTERNAL_SERVER_ERROR)
+            console.error('Error in toCheckDuplicateUser:', error.message);
+            throw error;
         }
+     
     }
 
     async create(data:Partial<User>){
-         let newuser = await this.userModel.create(data)
-         return newuser 
+        try {
+            let newuser = await this.userModel.create(data)
+            return newuser.save() 
+        } catch (error) {
+            console.error('Error in toCheckDuplicateUser:', error.message);
+            throw error;
+        }
+        
+    }
+
+    async findByEmail(data:string){
+        try {
+            let user = await this.userModel.findOne({data})
+            return user
+        } catch (error) {
+            console.error('error in finding user by email', error.message);
+            throw error;
+        }
     }
 }
