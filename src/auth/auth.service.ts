@@ -30,16 +30,17 @@ export class AuthService {
     async singIn(signInDto:signInDto):Promise<any>{
         
         const {email,password} = signInDto
-        const user = await this.userService.findByEmail(email)
+        let user = await this.userService.findByEmail(email)
         if(!user){
             throw new NotFoundException(`No user found`)
         }else{
             if(password){
                 const isMatch = await bcrypt.compare(password,user.password)
                 if(isMatch){
-                    const payload = {_id:user._id}
+                    const payload =  {_id:user._id}
                     const jwt = this.jwtService.sign(payload)
-                    return {jwt,user}
+                    let {password ,...userWithoutPass} = user.toObject()
+                    return {jwt,user:userWithoutPass}
                 }else{
                     throw new UnauthorizedException('Invalid password')
                 }

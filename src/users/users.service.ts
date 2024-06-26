@@ -30,9 +30,9 @@ export class UsersService {
         
     }
 
-    async findByEmail(data:string){
+    async findByEmail(email:string){
         try {
-            let user = await this.userModel.findOne({data})
+            let user = await this.userModel.findOne({email})
             return user
         } catch (error) {
             console.error('error in finding user by email', error.message);
