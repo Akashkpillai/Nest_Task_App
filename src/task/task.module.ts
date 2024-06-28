@@ -3,9 +3,11 @@ import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import {Task,TaskSchema} from './task.schema'
+import { PassportModule } from '@nestjs/passport';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports:[MongooseModule.forFeature([{ name: Task.name,schema:TaskSchema}])],
+  imports:[MongooseModule.forFeature([{ name: Task.name,schema:TaskSchema}]),AuthModule],
   controllers: [TaskController],
   providers: [TaskService]
 })

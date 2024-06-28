@@ -39,4 +39,13 @@ export class UsersService {
             throw error;
         }
     }
+    async findOneById(payload){
+        try {
+            let user = await this.userModel.findById({_id:payload})
+            return user
+        } catch (error) {
+            console.error('error in finding user by id', error.message);
+            throw error;
+        }
+    }
 }

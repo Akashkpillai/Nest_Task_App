@@ -5,6 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import { Response } from 'express';
 import { signInDto } from './authDto/signIn.dto';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './authDto/jwt.interface';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,7 @@ export class AuthService {
             }
             await this.userService.create(data)
     }
-    async singIn(signInDto:signInDto):Promise<any>{
+    async singIn(signInDto:signInDto):Promise<{jwt:string , user}>{
         
         const {email,password} = signInDto
         let user = await this.userService.findByEmail(email)
@@ -37,7 +38,7 @@ export class AuthService {
             if(password){
                 const isMatch = await bcrypt.compare(password,user.password)
                 if(isMatch){
-                    const payload =  {_id:user._id}
+                    const payload:JwtPayload =  {_id:user._id}
                     const jwt = this.jwtService.sign(payload)
                     let {password ,...userWithoutPass} = user.toObject()
                     return {jwt,user:userWithoutPass}

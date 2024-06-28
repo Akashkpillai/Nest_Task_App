@@ -5,4 +5,7 @@ export class createTaskDto {
 
     @IsNotEmpty()
     description:string;
+
+    @IsNotEmpty()
+    user:string
 }

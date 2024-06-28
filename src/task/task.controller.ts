@@ -3,10 +3,12 @@ import { filterTaskDto } from './DTO/filter-task-dto';
 import { updateDto } from './DTO/update-task.dto';
 import { Task, TaskStatus } from './task.model';
 import { TaskService } from './task.service';
-import { Body, Controller,Delete,Get, Param, Patch, Post ,Query } from '@nestjs/common';
+import { Body, Controller,Delete,Get, Param, Patch, Post ,Query, UseGuards } from '@nestjs/common';
 import {Task as task} from './task.schema'
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('task')
+@UseGuards(AuthGuard())
 export class TaskController {
     constructor (private taskService:TaskService){ }
         @Get()
